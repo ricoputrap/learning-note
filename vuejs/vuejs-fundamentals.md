@@ -208,3 +208,155 @@ const counter = useCounterStore();
   </div>
 </template>
 ```
+
+## 6. Props & Emits
+
+### 6.1. Props
+
+Props are used to pass data from a parent component to a child component. They are defined in the child component's `props` option.
+
+```vue
+<!-- Child.vue -->
+<script setup>
+import { defineProps } from "vue";
+
+interface Props {
+  message: string;
+}
+
+const props = defineProps<Props>();
+</script>
+
+<template>
+  <div>{{ message }}</div>
+</template>
+```
+
+```vue
+<!-- ChildWithDefault.vue -->
+<script setup>
+import { defineProps } from "vue";
+
+interface Props {
+  message?: string;
+}
+
+const props = withDefaults(defineProps<Props>(), {
+  message: "Default Message",
+});
+</script>
+
+<template>
+  <div>{{ message }}</div>
+</template>
+```
+
+```vue
+<!-- Parent.vue -->
+<script setup>
+import Child from "./Child.vue";
+import ChildWithDefault from "./ChildWithDefault.vue";
+
+const message = "Hello, World!";
+</script>
+
+<template>
+  <Child :message="message" />
+  <ChildWithDefault />
+</template>
+```
+
+### 6.2. Emits
+
+Emits are used to communicate events from a child component to a parent component. They are defined in the child component's `emits` option.
+
+```vue
+<!-- ChildWithEmits.vue -->
+<script setup>
+import { defineEmits } from "vue";
+
+const emit = defineEmits<{
+  (e: 'change', id: number): void
+  (e: 'update', value: string): void
+}>()
+
+function updateValue(value) {
+  emit("update", value);
+}
+
+function handleChange(id: number) {
+  emit("change", id);
+}
+</script>
+
+<template>
+  <input type="text" @input="updateValue($event.target.value)" />
+  <button @click="handleChange(1)">Change</button>
+</template>
+```
+
+```vue
+<!-- Parent.vue -->
+<script setup>
+import ChildWithEmits from "./ChildWithEmits.vue";
+
+// will execute this function when the user types something in the input field
+function handleChildChange(id: number) {
+  console.log(`Child with ID ${id} changed`);
+}
+
+// will execute this function when the user clicks on the Change btn
+function handleChildUpdate(value: string) {
+  console.log(`Child updated with value ${value}`);
+}
+</script>
+
+<template>
+  <ChildWithEmits @change="handleChildChange" @update="handleChildUpdate" />
+</template>
+```
+
+## 7. Slots
+
+Slots are used to pass content from a parent component to a child component. They are defined in the child component's template using the `<slot>` tag.
+
+```vue
+<!-- FancyButton.vue -->
+<script setup></script>
+
+<template>
+  <button class="fancy-btn">
+    <slot></slot>
+  </button>
+</template>
+```
+
+```vue
+<!-- Parent.vue -->
+<script setup>
+import FancyButton from "./FancyButton.vue";
+</script>
+
+<template>
+  <FancyButton> Click me! </FancyButton>
+</template>
+```
+
+## 8. List Rendering
+
+```vue
+<script setup lang="ts">
+const users = ref([
+  { id: 1, name: "Alex" },
+  { id: 2, name: "Bob" },
+]);
+</script>
+
+<template>
+  <ul>
+    <li v-for="user in users" :key="user.id">
+      {{ user.name }}
+    </li>
+  </ul>
+</template>
+```
